@@ -7,23 +7,20 @@ def wapiti(urls):
     i=0
     len_urls=len(urls)
     while(i<len_urls):
-        for k in range(0,3):
-            if(k==1):
-                final_args='-f csv -o ~/'+urls[i]+'.csv'+' --flush-attacks'
-            else:
-                final_args='-f csv -o ~/'+urls[i]+'.csv'
+        for k in range(1,4):
+            final_args='-f json -o ~/'+ urls[i] + '-' + k + '.json' + ' --flush-attacks'
             timestampInicio = datetime.now()
             temp = subprocess.run(cmd+ ' ' + '-u' + ' ' + urls[i] + ' ' + final_args)
             timestampFinal = datetime.now()
             duracao=timestampFinal-timestampInicio
             duracaoMin=duracao.min
-            nomeArquivoDuracao=urls[i]+'-'+(k+1)+'-duracao'+'.txt'  # Talvez colocar esse dado no csv logo
+            nomeArquivoDuracao=urls[i]+'-'+k+'-duracao'+'.txt'  # Talvez colocar esse dado no json logo
             with open(nomeArquivoDuracao, 'w') as writer:
                 writer.write(duracaoMin)
             sleep(120)
-            if k==2:
+            if k==3:
                 i+=1
-                k=0
+                k=1
   
 
     
