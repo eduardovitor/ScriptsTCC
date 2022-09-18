@@ -28,4 +28,4 @@ urls = list(open('lista_cidades.txt'))
 for i in range(len(urls)):
     urls[i] = urls[i].strip('\n')
 
-outputlist=wapiti(urls)
+wapiti(urls)
