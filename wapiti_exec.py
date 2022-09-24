@@ -1,15 +1,18 @@
+import ast
 import json
 import subprocess  
 from time import sleep
 from datetime import datetime
 
-def wapiti(urls):
+def wapiti(urls, severity_dict):
     cmd = 'wapiti'
     i=0
     len_urls=len(urls)
     while(i<len_urls):
         for k in range(1,4):
-            final_args='-f json -o '+ urls[i] + '-' + k + '.json' + ' --flush-attacks'
+            file_extension= '.json'
+            filename= urls[i] + '-' + k + file_extension
+            final_args='-f json -o '+ filename + ' --flush-attacks'
             timestampInicio = datetime.now()
             temp = subprocess.run(cmd+ ' ' + '-u' + ' ' + urls[i] + ' ' + final_args)
             timestampFinal = datetime.now()
@@ -19,10 +22,17 @@ def wapiti(urls):
                 "final_timestamp": timestampFinal,
                 "duration_minutes" : duracao.min
             }  
-            filename= urls[i] + '-' + k + '.json'
+            
             with open(filename,'r+') as file:
+                owasp_info_dict= {}
                 file_data = json.load(file)
+                for vul_key in file_data["vulnerabilities"]:
+                    vul_value = file_data["vulnerabilities"][vul_key]
+                    vul_class = severity_dict[vul_key]
+                    if len(vul_value)!=0:
+                        owasp_info_dict[vul_key]=vul_class
                 file_data["infos"].append(new_data)
+                file_data["owasp_classification"]=owasp_info_dict
                 file.seek(0)
                 json.dump(file_data, file, indent = 4)
             sleep(120)
@@ -36,5 +46,10 @@ urls = list(open('lista_cidades.txt'))
 for i in range(len(urls)):
     urls[i] = urls[i].strip('\n')
 
-wapiti(urls)
+with open('owasp_severity_dict.txt','r') as dict_file:
+  dict_data = dict_file.read()
+
+dictionary = ast.literal_eval(dict_data)
+
+wapiti(urls, dictionary)
 
