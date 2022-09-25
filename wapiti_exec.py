@@ -11,10 +11,11 @@ def wapiti(urls, severity_dict):
     while(i<len_urls):
         for k in range(1,4):
             file_extension= '.json'
-            filename= urls[i] + '-' + k + file_extension
-            final_args='-f json -o '+ filename + ' --flush-attacks'
+            filename= urls[i] + '_' + str(k) + file_extension
+            final_args='-f json -o '+ filename + ' --flush-session'
             timestampInicio = datetime.now()
-            temp = subprocess.run(cmd+ ' ' + '-u' + ' ' + urls[i] + ' ' + final_args)
+            final_command= cmd + ' ' + '-u' + ' ' + urls[i] + ' ' + final_args
+            temp = subprocess.run(final_command, shell=True)
             timestampFinal = datetime.now()
             duracao=timestampFinal-timestampInicio
             new_data={
