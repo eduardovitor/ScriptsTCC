@@ -21,6 +21,7 @@ def wapiti(urls, severity_dict):
         final_command= cmd + ' ' + '-u' + ' ' + urls[i] + ' ' + final_args
         subprocess.run(final_command, shell=True)
         timestampFinal = datetime.now()
+        duration=timestampFinal-timestampInicio
         sleep(sleep_time)
         with open(filepath,'r+') as file:
             owasp_info_dict= {}
@@ -32,6 +33,7 @@ def wapiti(urls, severity_dict):
                     owasp_info_dict[vul_key]=vul_class
                 file_data["infos"]["start_timestamp"]=timestampInicio.strftime("%m/%d/%Y, %H:%M:%S")
                 file_data["infos"]["final_timestamp"]=timestampFinal.strftime("%m/%d/%Y, %H:%M:%S")
+                file_data["infos"]["duration"]=str(duration)
                 file_data["owasp_classification"]=owasp_info_dict
                 file.seek(0)
                 json.dump(file_data, file, indent = 4)
