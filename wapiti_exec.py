@@ -3,13 +3,20 @@ import json
 import subprocess
 from time import sleep
 from datetime import datetime
-
+import csv
 
 def get_urls_from_file(filepath):
     urls = list(open(filepath))
     for i in range(len(urls)):
         urls[i] = urls[i].strip('\n')
     return urls
+
+def get_city_dict_from_file(filepath):
+    dict_from_csv = {}
+    with open(filepath, mode='r') as file:
+        reader = csv.reader(file)
+        dict_from_csv = {rows[0]:rows[1] for rows in reader}
+    return dict_from_csv
 
 def get_severity_dict_from_file(filepath):
     with open(filepath,'r') as dict_file:
@@ -31,22 +38,24 @@ def define_report_name(url):
     name_to_save = name_to_save.replace("r/","r")
     return name_to_save
 
-def update_wapiti_report(filepath, timestampInicio, timestampFinal, severity_dict, duration, exp_round):
+def update_wapiti_report(filepath, timestampInicio, timestampFinal, severity_dict, duration, exp_round, city_dict):
     with open(filepath,'r+') as file:
         owasp_info_dict = {}
         file_data = json.load(file)
         owasp_info_dict = update_owasp_classf(file_data["vulnerabilities"],owasp_info_dict,severity_dict)
         owasp_info_dict = update_owasp_classf(file_data["anomalies"],owasp_info_dict,severity_dict)
         owasp_info_dict = update_owasp_classf(file_data["additionals"],owasp_info_dict,severity_dict)
+        target_url = file_data["infos"]["target"]
         file_data["infos"]["start_timestamp"] = timestampInicio.strftime("%m/%d/%Y, %H:%M:%S")
         file_data["infos"]["final_timestamp"] = timestampFinal.strftime("%m/%d/%Y, %H:%M:%S")
         file_data["infos"]["duration"] = str(duration)
         file_data["infos"]["exp_round"] = str(exp_round)
+        file_data["infos"]["city"] = city_dict[target_url]
         file_data["owasp_classification"] = owasp_info_dict
         file.seek(0)
         json.dump(file_data, file, indent = 4)
     
-def wapiti(urls, severity_dict, exp_round):
+def wapiti(urls, severity_dict, exp_round, city_dict):
     cmd = 'wapiti'
     i = 0
     len_urls = len(urls)
@@ -63,12 +72,13 @@ def wapiti(urls, severity_dict, exp_round):
         timestampFinal = datetime.now()
         duration = timestampFinal-timestampInicio
         sleep(sleep_time)
-        update_wapiti_report(filepath,timestampInicio,timestampFinal,severity_dict,duration, exp_round)
+        update_wapiti_report(filepath,timestampInicio,timestampFinal,severity_dict,duration, exp_round, city_dict)
         sleep(sleep_time)
         i+=1
 
 exp_round=1
 urls = get_urls_from_file('lista_cidades_teste.txt')
-dictionary = get_severity_dict_from_file('owasp_severity_dict_pyformat.txt')
-wapiti(urls, dictionary, exp_round)
+owasp_dict = get_severity_dict_from_file('owasp_severity_dict_pyformat.txt')
+city_dict = get_city_dict_from_file('cidade_url_dict.csv')
+wapiti(urls, owasp_dict, exp_round, city_dict)
 
