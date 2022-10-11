@@ -1,10 +1,8 @@
-from datetime import datetime
 import glob
 import json
 import csv
 
 # Part 1 - additional information csv
-date = datetime.now()
 data = []
 dir = 'exp_data'
 files = glob.glob( dir + '/*', recursive=True)
