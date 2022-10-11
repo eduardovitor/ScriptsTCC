@@ -4,8 +4,6 @@ import subprocess
 from time import sleep
 from datetime import datetime
 
-from httpx import get
-
 
 def get_urls_from_file(filepath):
     urls = list(open(filepath))
@@ -33,7 +31,7 @@ def define_report_name(url):
     name_to_save = name_to_save.replace("r/","r")
     return name_to_save
 
-def update_wapiti_report(filepath, timestampInicio, timestampFinal, severity_dict, duration):
+def update_wapiti_report(filepath, timestampInicio, timestampFinal, severity_dict, duration, exp_round):
     with open(filepath,'r+') as file:
         owasp_info_dict = {}
         file_data = json.load(file)
@@ -43,11 +41,12 @@ def update_wapiti_report(filepath, timestampInicio, timestampFinal, severity_dic
         file_data["infos"]["start_timestamp"] = timestampInicio.strftime("%m/%d/%Y, %H:%M:%S")
         file_data["infos"]["final_timestamp"] = timestampFinal.strftime("%m/%d/%Y, %H:%M:%S")
         file_data["infos"]["duration"] = str(duration)
+        file_data["infos"]["exp_round"] = str(exp_round)
         file_data["owasp_classification"] = owasp_info_dict
         file.seek(0)
         json.dump(file_data, file, indent = 4)
     
-def wapiti(urls, severity_dict):
+def wapiti(urls, severity_dict, exp_round):
     cmd = 'wapiti'
     i = 0
     len_urls = len(urls)
@@ -64,11 +63,12 @@ def wapiti(urls, severity_dict):
         timestampFinal = datetime.now()
         duration = timestampFinal-timestampInicio
         sleep(sleep_time)
-        update_wapiti_report(filepath,timestampInicio,timestampFinal,severity_dict,duration)
+        update_wapiti_report(filepath,timestampInicio,timestampFinal,severity_dict,duration, exp_round)
         sleep(sleep_time)
         i+=1
 
+exp_round=1
 urls = get_urls_from_file('lista_cidades_teste.txt')
 dictionary = get_severity_dict_from_file('owasp_severity_dict_pyformat.txt')
-wapiti(urls, dictionary)
+wapiti(urls, dictionary, exp_round)
 
