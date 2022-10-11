@@ -1,6 +1,6 @@
 
 BEGIN{
-   print("Cidade,URL");
+   print("URL,Cidade");
    i=1;
    i2=1;
 }
@@ -20,7 +20,7 @@ BEGIN{
 END {
   k=1;
   while(k<=99){
-    print(arr_cidades[k] "," arr_urls[k]);
+    print(arr_urls[k] "," arr_cidades[k]);
     k++;
   }
 }
