@@ -16,6 +16,7 @@ for single_file in files:
     json_file["infos"]["target"],
     json_file["infos"]["start_timestamp"],
     json_file["infos"]["final_timestamp"],
+    json_file["infos"]["duration"],
     json_file["infos"]["scope"],
     json_file["infos"]["crawled_pages_nbr"]
     ])
