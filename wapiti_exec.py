@@ -46,8 +46,8 @@ def update_wapiti_report(filepath, timestampInicio, timestampFinal, severity_dic
         owasp_info_dict = update_owasp_classf(file_data["anomalies"],owasp_info_dict,severity_dict)
         owasp_info_dict = update_owasp_classf(file_data["additionals"],owasp_info_dict,severity_dict)
         target_url = file_data["infos"]["target"]
-        file_data["infos"]["start_timestamp"] = timestampInicio.strftime("%m/%d/%Y, %H:%M:%S")
-        file_data["infos"]["final_timestamp"] = timestampFinal.strftime("%m/%d/%Y, %H:%M:%S")
+        file_data["infos"]["start_timestamp"] = timestampInicio.strftime("%Y-%m-%d %H:%M:%S")
+        file_data["infos"]["final_timestamp"] = timestampFinal.strftime("%Y-%m-%d %H:%M:%S")
         file_data["infos"]["duration"] = str(duration)
         file_data["infos"]["exp_round"] = str(exp_round)
         file_data["infos"]["city"] = city_dict[target_url]
