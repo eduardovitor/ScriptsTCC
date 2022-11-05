@@ -19,7 +19,7 @@ BEGIN{
 
 END {
   k=1;
-  while(k<=99){
+  while(k<=101){
     print(arr_urls[k] "," arr_cidades[k]);
     k++;
   }
