@@ -1,0 +1,68 @@
+---
+title: "AnaliseVulnerabilidades"
+author: "eduardovitor"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+ library(tidyverse)
+ library(dplyr)
+```
+
+```{r Leitura dos arquivos}
+  workdir ="/home/eduardovitor/Downloads/Share_R_Analysis-20221025T173621Z-001/Share_R_Analysis/"
+  vul_arquivo = paste(workdir,"vul_data.csv",sep="")
+  info_adicional_arquivo = paste(workdir, "additional_info.csv",sep="")
+  df_vulnerabilidades = read_csv(vul_arquivo)
+  df_info_adicional = read_csv(info_adicional_arquivo)
+```
+
+```{r}
+  str(df_vulnerabilidades)
+```
+```{r}
+  str(df_info_adicional)
+```
+
+
+
+```{r Qual foi o tempo médio de testes entre as cidades analisadas?}
+  df_info_adicional <- df_info_adicional %>% 
+   mutate(duration_min=round(difftime(df_info_adicional$final_timestamp,df_info_adicional$start_timestamp,units="mins")))
+```
+
+```{r Qual foi o tempo médio de testes entre as cidades analisadas?}
+   df_info_adicional  %>% 
+   filter(duration_min>0) %>% 
+   summarise(media_duracao_testes=mean(duration_min), desvio_padrao=sd(duration_min))
+```
+
+
+
+```{r Qual foi a média de páginas escaneadas pela ferramenta entre as cidades analisadas?}
+  print("Resumo das páginas escaneadas")
+  summary(df_info_adicional$crawled_pages)
+  
+```
+
+```{r Qual é a categoria de vulnerabilidade mais comum entre as cidades analisadas?}
+ # df_vulnerabilidades %>% count(df_vulnerabilidades$vul_category)
+  df_vulnerabilidades %>% 
+  ggplot(aes(x = vul_category, fill=vul_category)) +
+  geom_bar()+
+  theme_minimal()+
+  labs(x='Categoria de vulnerabilidade')
+```
+
+```{r Qual é a quantidade de vulnerabilidades entre as cidades analisadas?}
+  df_vulnerabilidades %>% 
+  ggplot(aes(x = city, fill=vul_category)) +
+  geom_bar(position = "fill")+
+  theme_minimal()+
+  labs(x='Cidade', y='Vulnerabilidades')
+```
+
+
+
+
