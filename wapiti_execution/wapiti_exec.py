@@ -39,7 +39,7 @@ def define_report_name(url):
     name_to_save = name_to_save.replace("r/","r")
     return name_to_save
 
-def update_wapiti_report(filepath, timestampInicio, timestampFinal, severity_dict, duration, exp_round, city_dict):
+def update_wapiti_report(filepath, timestampInicio, timestampFinal, severity_dict, exp_round, city_dict):
     with open(filepath,'r+') as file:
         owasp_info_dict = {}
         file_data = json.load(file)
@@ -49,7 +49,6 @@ def update_wapiti_report(filepath, timestampInicio, timestampFinal, severity_dic
         target_url = file_data["infos"]["target"]
         file_data["infos"]["start_timestamp"] = timestampInicio.strftime("%Y-%m-%d %H:%M:%S")
         file_data["infos"]["final_timestamp"] = timestampFinal.strftime("%Y-%m-%d %H:%M:%S")
-        file_data["infos"]["duration"] = str(duration)
         file_data["infos"]["exp_round"] = exp_round
         file_data["infos"]["city"] = city_dict[target_url]
         file_data["owasp_classification"] = owasp_info_dict
@@ -71,9 +70,8 @@ def wapiti(urls, severity_dict, exp_round, city_dict):
         final_command = cmd + ' ' + '-u' + ' ' + urls[i] + ' ' + final_args
         subprocess.run(final_command, shell=True)
         timestampFinal = datetime.now()
-        duration = timestampFinal-timestampInicio
         sleep(sleep_time)
-        update_wapiti_report(filepath,timestampInicio,timestampFinal,severity_dict,duration, exp_round, city_dict)
+        update_wapiti_report(filepath,timestampInicio,timestampFinal,severity_dict, exp_round, city_dict)
         sleep(sleep_time)
         i+=1
 
