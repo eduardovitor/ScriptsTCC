@@ -4,6 +4,7 @@ import subprocess
 from time import sleep
 from datetime import datetime
 import csv
+import argparse
 
 def get_severity_dict_from_file(filepath):
     with open(filepath,'r') as dict_file:
@@ -62,8 +63,12 @@ def wapiti(severity_dict, exp_round, city_dict):
     update_wapiti_report(filepath,timestampInicio,timestampFinal,severity_dict,duration, exp_round, city_dict)
     sleep(sleep_time)
 
-exp_round=2
-dictionary = get_severity_dict_from_file('owasp_severity_dict_pyformat.txt')
-city_dict = get_city_dict_from_file('url_cidade_dict.csv')
-wapiti(dictionary,exp_round,city_dict)
+parser = argparse.ArgumentParser(description='A script to automate Wapiti execution to attack many urls sequentially')
+parser.add_argument("--exp_round", help="Adds the round information to the experiment (1,2,..)",required=True)
+parser.add_argument("--severity_dict_path", help="Path to severity dict file",default='owasp_severity_dict_pyformat.txt')
+parser.add_argument("--city_dict_path", help="Adds the severity dict information to the experiment",default='url_cidade_dict.csv')
+args = parser.parse_args()
+dictionary = get_severity_dict_from_file(args.severity_dict_path)
+city_dict = get_city_dict_from_file(args.city_dict_path)
+wapiti(dictionary,args.exp_round,city_dict)
 
