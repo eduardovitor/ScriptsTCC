@@ -4,6 +4,7 @@ import subprocess
 from time import sleep
 from datetime import datetime
 import csv
+import argparse
 
 def get_urls_from_file(filepath):
     urls = list(open(filepath))
@@ -49,7 +50,7 @@ def update_wapiti_report(filepath, timestampInicio, timestampFinal, severity_dic
         file_data["infos"]["start_timestamp"] = timestampInicio.strftime("%Y-%m-%d %H:%M:%S")
         file_data["infos"]["final_timestamp"] = timestampFinal.strftime("%Y-%m-%d %H:%M:%S")
         file_data["infos"]["duration"] = str(duration)
-        file_data["infos"]["exp_round"] = str(exp_round)
+        file_data["infos"]["exp_round"] = exp_round
         file_data["infos"]["city"] = city_dict[target_url]
         file_data["owasp_classification"] = owasp_info_dict
         file.seek(0)
@@ -76,9 +77,14 @@ def wapiti(urls, severity_dict, exp_round, city_dict):
         sleep(sleep_time)
         i+=1
 
-exp_round=1
-urls = get_urls_from_file('lista_cidades_teste.txt')
-owasp_dict = get_severity_dict_from_file('owasp_severity_dict_pyformat.txt')
-city_dict = get_city_dict_from_file('cidade_url_dict.csv')
-wapiti(urls, owasp_dict, exp_round, city_dict)
+parser = argparse.ArgumentParser(description='A script to automate Wapiti execution to attack many urls sequentially')
+parser.add_argument("--exp_round", help="Adds the round information to the experiment (1,2,..)",required=True)
+parser.add_argument("--urls_path", help="Path to URLs file",default='lista_urls.txt')
+parser.add_argument("--severity_dict_path", help="Path to severity dict file",default='owasp_severity_dict_pyformat.txt')
+parser.add_argument("--city_dict_path", help="Adds the severity dict information to the experiment",default='url_cidade_dict.csv')
+args = parser.parse_args()
+urls = get_urls_from_file(args.urls_path)
+owasp_dict = get_severity_dict_from_file(args.severity_dict_path)
+city_dict = get_city_dict_from_file(args.city_dict_path)
+wapiti(urls, owasp_dict, args.exp_round, city_dict)
 
