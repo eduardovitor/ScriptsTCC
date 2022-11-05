@@ -16,7 +16,6 @@ for single_file in files:
     json_file["infos"]["target"],
     json_file["infos"]["start_timestamp"],
     json_file["infos"]["final_timestamp"],
-    json_file["infos"]["duration"],
     json_file["infos"]["scope"],
     json_file["infos"]["crawled_pages_nbr"]
     ])
@@ -25,7 +24,7 @@ for single_file in files:
 additional_data.sort()
 
 # Add headers
-additional_data.insert(0, ['exp_round', 'city', 'url', 'start_timestamp', 'final_timestamp', 'duration', 'scope', 'crawled_pages'])
+additional_data.insert(0, ['exp_round', 'city', 'url', 'start_timestamp', 'final_timestamp', 'scope', 'crawled_pages'])
 
 with open('additional_info.csv', "w", newline="") as f:
     writer = csv.writer(f)
