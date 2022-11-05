@@ -55,13 +55,13 @@ def update_wapiti_report(filepath, timestampInicio, timestampFinal, severity_dic
         file.seek(0)
         json.dump(file_data, file, indent = 4)
     
-def wapiti(urls, severity_dict, exp_round, city_dict):
+def wapiti(urls, severity_dict, report_dir, exp_round, city_dict):
     cmd = 'wapiti'
     i = 0
     len_urls = len(urls)
     while(i<len_urls):
         sleep_time = 5
-        home_folder = '/home/ubuntu/'
+        home_folder = report_dir
         file_extension = '.json'
         name_to_save = define_report_name(urls[i])
         filepath = home_folder + name_to_save + file_extension
@@ -77,6 +77,7 @@ def wapiti(urls, severity_dict, exp_round, city_dict):
 
 parser = argparse.ArgumentParser(description='A script to automate Wapiti execution to attack many urls sequentially')
 parser.add_argument("--exp_round", help="Adds the round information to the experiment (1,2,..)",required=True)
+parser.add_argument("--report_dir", help="Adds the dir where wapiti reports will be stored",required=True)
 parser.add_argument("--urls_path", help="Path to URLs file",default='lista_urls.txt')
 parser.add_argument("--severity_dict_path", help="Path to severity dict file",default='owasp_severity_dict_pyformat.txt')
 parser.add_argument("--city_dict_path", help="Adds the severity dict information to the experiment",default='url_cidade_dict.csv')
@@ -84,5 +85,5 @@ args = parser.parse_args()
 urls = get_urls_from_file(args.urls_path)
 owasp_dict = get_severity_dict_from_file(args.severity_dict_path)
 city_dict = get_city_dict_from_file(args.city_dict_path)
-wapiti(urls, owasp_dict, args.exp_round, city_dict)
+wapiti(urls, owasp_dict, args.report_dir, args.exp_round, city_dict)
 
