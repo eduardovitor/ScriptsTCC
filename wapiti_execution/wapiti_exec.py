@@ -64,7 +64,7 @@ def wapiti(urls, severity_dict, report_dir, exp_round, city_dict):
         home_folder = report_dir
         file_extension = '.json'
         name_to_save = define_report_name(urls[i])
-        filepath = home_folder + name_to_save + file_extension
+        filepath = home_folder + name_to_save + '_' + exp_round + file_extension
         final_args = '-v 2 -f json -o '+ filepath
         timestampInicio = datetime.now()
         final_command = cmd + ' ' + '-u' + ' ' + urls[i] + ' ' + final_args
