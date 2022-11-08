@@ -18,7 +18,7 @@ func executeExperiment(index int, line string) {
 		fmt.Println(err)
 	}
 
-    volumeBind := "/home/eduardovitor/teste_volume:/home/wapiti_reports"
+        volumeBind := "/home/eduardovitor/teste_volume:/home/wapiti_reports"
 	docker_cmd := "docker"
 	envArg := "URLS_PATH=" + fileName
 	container_name := "wapiti" + strconv.FormatInt(int64(index+1), 10)
