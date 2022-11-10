@@ -24,7 +24,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
   LANG=en_US.UTF-8 \
   PYTHONDONTWRITEBYTECODE=1 \
   EXP_ROUND=1 \
-  REPORT_DIR=/home/wapiti_reports \
+  REPORT_DIR=/home/wapiti_reports/ \
   SEVERITY_DICT_PATH=owasp_severity_dict_pyformat.txt \
   CITY_DICT_PATH=url_cidade_dict.txt
 
