@@ -9,20 +9,32 @@ import (
 )
 
 func executeExperiment(index int, line string) {
-	lineToWrite := []byte(line)
-	fileName := "cidade_" + strconv.FormatInt(int64(index+1), 10)
-	imageId := "d9996f00f450"
+	cityfileName := "cidade_" + strconv.FormatInt(int64(index+1), 10)
+	imageId := "06b7967ea520"
+	hostBind := "/home/eduardovitor/teste_volume"
+	containerBind := "/home/wapiti_reports"
+	volumeBind := fmt.Sprintf("%s:%s", hostBind, containerBind)
+	dockerCmd := "docker"
+	expRoundEnv := 1
+	urlsPathEnv := cityfileName
+	cityDictEnv := "url_cidade_dict.txt"
+	severityDictEnv := "owasp_severity_dict_pyformat.txt"
+	envVars := "EXP_ROUND=" + strconv.FormatInt(int64(expRoundEnv), 10) +
+		"\n" +
+		"URLS_PATH=" + urlsPathEnv +
+		"\n" +
+		"CITY_DICT_PATH=" + cityDictEnv +
+		"\n" +
+		"SEVERITY_DICT_PATH=" + severityDictEnv
+	envFilePath := "envfile.txt"
 
-	err := os.WriteFile(fileName, lineToWrite, 0644)
+	err := os.WriteFile(envFilePath, []byte(envVars), 0644)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-        volumeBind := "/home/eduardovitor/teste_volume:/home/wapiti_reports"
-	docker_cmd := "docker"
-	envArg := "URLS_PATH=" + fileName
 	container_name := "wapiti" + strconv.FormatInt(int64(index+1), 10)
-	cmd := exec.Command("sudo", docker_cmd, "run", "--env", envArg, "--name", container_name, "-v", volumeBind, "-dt", imageId)
+	cmd := exec.Command("sudo", dockerCmd, "run", "--name", container_name, "--env-file", envFilePath, "-v", volumeBind, "-dt", imageId)
 	stdout, err := cmd.Output()
 	if err != nil {
 		fmt.Println(err.Error())
@@ -50,7 +62,7 @@ func main() {
 	readFile.Close()
 
 	for i, line := range fileLines {
-		if i == 5 {
+		if i == 2 {
 			break
 		}
 		fmt.Println(line)
