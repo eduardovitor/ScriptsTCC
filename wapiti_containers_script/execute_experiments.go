@@ -1,14 +1,13 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
 	"strconv"
 )
 
-func executeExperiment(index int, line string) {
+func executeExperiment(index int) {
 	cityfileName := "cidade_" + strconv.FormatInt(int64(index+1), 10)
 	imageId := "06b7967ea520"
 	hostBind := "/home/eduardovitor/teste_volume"
@@ -43,30 +42,12 @@ func executeExperiment(index int, line string) {
 }
 
 func main() {
-
-	filePath := "lista_urls_atualizada.txt"
-	readFile, err := os.Open(filePath)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
-	var fileLines []string
-
-	for fileScanner.Scan() {
-		fileLines = append(fileLines, fileScanner.Text())
-	}
-
-	readFile.Close()
-
-	for i, line := range fileLines {
+	urlNumber := 101
+	for i := 0; i <= urlNumber; i++ {
 		if i == 2 {
 			break
 		}
-		fmt.Println(line)
-		executeExperiment(i, line)
+		executeExperiment(i)
 	}
 
 }
