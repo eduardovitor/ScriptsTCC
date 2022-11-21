@@ -55,7 +55,7 @@ def update_wapiti_report(filepath, timestampInicio, timestampFinal, severity_dic
         file.seek(0)
         json.dump(file_data, file, indent = 4)
     
-def wapiti(urls, severity_dict, report_dir, exp_round, city_dict):
+def wapiti(urls, severity_dict, report_dir, exp_round, city_dict, max_scan_time, max_attack_time):
     cmd = 'wapiti'
     i = 0
     len_urls = len(urls)
@@ -65,7 +65,7 @@ def wapiti(urls, severity_dict, report_dir, exp_round, city_dict):
         file_extension = '.json'
         name_to_save = define_report_name(urls[i])
         filepath = home_folder + name_to_save + '_' + exp_round + file_extension
-        final_args = '-v 2 -f json -o '+ filepath
+        final_args = '-d 4 -v 2 -f json -o '+ filepath + '--max-scan-time' + ' ' + max_scan_time + ' ' + '--max-attack-time' + max_attack_time
         timestampInicio = datetime.now()
         final_command = cmd + ' ' + '-u' + ' ' + urls[i] + ' ' + final_args
         subprocess.run(final_command, shell=True)
@@ -80,10 +80,11 @@ REPORT_DIR = str(os.environ.get('REPORT_DIR'))
 URLS_PATH = str(os.environ.get('URLS_PATH'))
 SEVERITY_DICT_PATH = str(os.environ.get('SEVERITY_DICT_PATH'))
 CITY_DICT_PATH = str(os.environ.get('CITY_DICT_PATH'))
+MAX_SCAN_TIME = str(os.environ.get('MAX_SCAN_TIME'))
+MAX_ATTACK_TIME = str(os.environ.get('MAX_ATTACK_TIME'))
 
 urls = get_urls_from_file(URLS_PATH)
 owasp_dict = get_severity_dict_from_file(SEVERITY_DICT_PATH)
 city_dict = get_city_dict_from_file(CITY_DICT_PATH)
 
-wapiti(urls, owasp_dict, REPORT_DIR, EXP_ROUND, city_dict)
-
+wapiti(urls, owasp_dict, REPORT_DIR, EXP_ROUND, city_dict, MAX_SCAN_TIME, MAX_ATTACK_TIME)
