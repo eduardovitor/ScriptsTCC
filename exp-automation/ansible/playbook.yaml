@@ -1,0 +1,31 @@
+---
+
+- name: Execute experiments
+  hosts: wapiti
+  tasks:
+    - name: Install Pip
+      ansible.builtin.apt:
+        name:
+          - python3-pip
+        update_cache: true
+        state: present
+      become: true
+    - name: Copy Wapiti files
+      ansible.builtin.copy:
+        src: /home/eduardovitor/Downloads/wapiti-3.1.4-bugfix.tar.gz
+        dest: ~/wapiti-3.1.4-bugfix.tar.gz
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
+    - name: Extract Wapiti files
+      ansible.builtin.unarchive:
+        src: ~/wapiti-3.1.4-bugfix.tar.gz
+        dest: ~/
+        remote_src: true
+    - name: Install Wapiti
+      ansible.builtin.command: python3 setup.py install
+      become: true
+      register: my_output
+      changed_when: my_output.rc != 0
+      args:
+        chdir: wapiti-3.1.4/
