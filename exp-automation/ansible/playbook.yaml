@@ -5,9 +5,17 @@
   vars:
     report_dir: "~/report_results"
     wapiti_file_name: "wapiti-3.1.4-bugfix.tar.gz"
-    local_wapiti_files_path: "/home/eduardovitor/Downloads/"
+    local_wapiti_files_path: "/home/tcc/Downloads"
     wapiti_remote_dir: "wapiti-3.1.4/"
     exp_files_name: "experiment_setup.tar.gz"
+    exp_env:
+      EXP_ROUND: 1
+      REPORT_DIR: report_dir
+      URLS_PATH: cidade_{{ my_idx + 1 }}
+      SEVERITY_DICT_PATH: owasp_severity_dict_pyformat.txt
+      CITY_DICT_PATH: url_cidade_dict.txt
+      MAX_SCAN_TIME: 720
+      MAX_ATTACK_TIME: 648
   tasks:
     - name: Install Pip
       ansible.builtin.apt:
@@ -53,14 +61,7 @@
       tags:
         - test
       ansible.builtin.command: python3 wapiti_exec_docker.py
-      environment:
-        EXP_ROUND: 1
-        REPORT_DIR: report_dir
-        URLS_PATH: cidade_{{ my_idx + 1 }}
-        SEVERITY_DICT_PATH: owasp_severity_dict_pyformat.txt
-        CITY_DICT_PATH: url_cidade_dict.txt
-        MAX_SCAN_TIME: 720
-        MAX_ATTACK_TIME: 648
+      environment: "{{ exp_env }}"
       args:
         chdir: ~/{{ report_dir }}
       delegate_to: "{{ item }}"
