@@ -41,8 +41,8 @@
       become: true
       args:
         chdir: wapiti_remote_dir
-      register: my_output # <- Registers the command output.
-      changed_when: my_output.rc != 0 # <- Uses the return code to define when the task has changed.
+      register: my_output
+      changed_when: my_output.rc != 0
     - name: Copy experiment files
       ansible.builtin.copy:
         src: "{{ local_wapiti_files_path }}/{{ exp_files_name }}"
@@ -50,6 +50,11 @@
         owner: ubuntu
         group: ubuntu
         mode: '0644'
+    - name: Extract experiment files
+      ansible.builtin.unarchive:
+        src: ~/{{ exp_files_name }}
+        dest: ~/
+        remote_src: true
     - name: Create the exp results dir
       tags:
         - dir
@@ -63,9 +68,17 @@
       ansible.builtin.command: python3 wapiti_exec_docker.py
       environment: "{{ exp_env }}"
       args:
-        chdir: ~/{{ report_dir }}
+        chdir: ~
       delegate_to: "{{ item }}"
       loop: "{{ groups['wapiti'] }}"
       when: inventory_hostname == item
       loop_control:
         index_var: my_idx
+    - name: Compress results
+      ansible.builtin.command: zip -r {{ report_dir }}.zip {{ report_dir }}
+      register: my_output
+      changed_when: my_output.rc != 0
+    - name: Copy results to local machine
+      ansible.builtin.fetch:
+        src: "{{ report_dir }}.zip"
+        dest: "{{ local_wapiti_files_path }}"
