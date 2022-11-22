@@ -2,6 +2,12 @@
 
 - name: Execute experiments
   hosts: wapiti
+  vars:
+    report_dir: "~/report_results"
+    wapiti_file_name: "wapiti-3.1.4-bugfix.tar.gz"
+    local_wapiti_files_path: "/home/eduardovitor/Downloads/"
+    wapiti_remote_dir: "wapiti-3.1.4/"
+    exp_files_name: "experiment_setup.tar.gz"
   tasks:
     - name: Install Pip
       ansible.builtin.apt:
@@ -12,20 +18,53 @@
       become: true
     - name: Copy Wapiti files
       ansible.builtin.copy:
-        src: /home/eduardovitor/Downloads/wapiti-3.1.4-bugfix.tar.gz
-        dest: ~/wapiti-3.1.4-bugfix.tar.gz
+        src: "{{ local_wapiti_files_path }}/{{ wapiti_file_name }}"
+        dest: ~/{{ wapiti_file_name }}
         owner: ubuntu
         group: ubuntu
         mode: '0644'
     - name: Extract Wapiti files
       ansible.builtin.unarchive:
-        src: ~/wapiti-3.1.4-bugfix.tar.gz
+        src: ~/{{ wapiti_file_name }}
         dest: ~/
         remote_src: true
     - name: Install Wapiti
       ansible.builtin.command: python3 setup.py install
       become: true
-      register: my_output
-      changed_when: my_output.rc != 0
       args:
-        chdir: wapiti-3.1.4/
+        chdir: wapiti_remote_dir
+      register: my_output # <- Registers the command output.
+      changed_when: my_output.rc != 0 # <- Uses the return code to define when the task has changed.
+    - name: Copy experiment files
+      ansible.builtin.copy:
+        src: "{{ local_wapiti_files_path }}/{{ exp_files_name }}"
+        dest: ~/{{ exp_files_name }}
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
+    - name: Create the exp results dir
+      tags:
+        - dir
+      ansible.builtin.file:
+        path: report_dir
+        state: directory
+        mode: '0755'
+    - name: Run experiments
+      tags:
+        - test
+      ansible.builtin.command: python3 wapiti_exec_docker.py
+      environment:
+        EXP_ROUND: 1
+        REPORT_DIR: report_dir
+        URLS_PATH: cidade_{{ my_idx + 1 }}
+        SEVERITY_DICT_PATH: owasp_severity_dict_pyformat.txt
+        CITY_DICT_PATH: url_cidade_dict.txt
+        MAX_SCAN_TIME: 720
+        MAX_ATTACK_TIME: 648
+      args:
+        chdir: ~/{{ report_dir }}
+      delegate_to: "{{ item }}"
+      loop: "{{ groups['wapiti'] }}"
+      when: inventory_hostname == item
+      loop_control:
+        index_var: my_idx
