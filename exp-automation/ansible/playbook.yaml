@@ -3,21 +3,20 @@
 - name: Execute experiments
   hosts: wapiti
   vars:
-    report_dir: "~/report_results"
+    report_dir: "~/report_results/"
     wapiti_file_name: "wapiti-3.1.4-bugfix.tar.gz"
     local_wapiti_files_path: "/home/tcc/Downloads"
     wapiti_remote_dir: "wapiti-3.1.4/"
-    exp_files_name: "experiment_setup.tar.gz"
-    exp_env:
-      EXP_ROUND: 1
-      REPORT_DIR: report_dir
-      URLS_PATH: cidade_{{ my_idx + 1 }}
-      SEVERITY_DICT_PATH: owasp_severity_dict_pyformat.txt
-      CITY_DICT_PATH: url_cidade_dict.txt
-      MAX_SCAN_TIME: 720
-      MAX_ATTACK_TIME: 648
+    exp_files_name: "experiment_setup.tar.xz"
+    exp_round: 1
+    severity_dict_path: owasp_severity_dict_pyformat.txt
+    city_dict_path: url_cidade_dict.txt
+    max_scan_time: 300
+    max_attack_time: 30
   tasks:
     - name: Install Pip
+      tags:
+        - teste
       ansible.builtin.apt:
         name:
           - python3-pip
@@ -25,6 +24,8 @@
         state: present
       become: true
     - name: Copy Wapiti files
+      tags:
+        - teste
       ansible.builtin.copy:
         src: "{{ local_wapiti_files_path }}/{{ wapiti_file_name }}"
         dest: ~/{{ wapiti_file_name }}
@@ -32,18 +33,24 @@
         group: ubuntu
         mode: '0644'
     - name: Extract Wapiti files
+      tags:
+        - teste
       ansible.builtin.unarchive:
         src: ~/{{ wapiti_file_name }}
         dest: ~/
         remote_src: true
     - name: Install Wapiti
+      tags:
+        - teste
       ansible.builtin.command: python3 setup.py install
       become: true
       args:
-        chdir: wapiti_remote_dir
+        chdir: "{{ wapiti_remote_dir }}"
       register: my_output
       changed_when: my_output.rc != 0
     - name: Copy experiment files
+      tags:
+        - teste
       ansible.builtin.copy:
         src: "{{ local_wapiti_files_path }}/{{ exp_files_name }}"
         dest: ~/{{ exp_files_name }}
@@ -51,22 +58,32 @@
         group: ubuntu
         mode: '0644'
     - name: Extract experiment files
+      tags:
+        - teste
       ansible.builtin.unarchive:
         src: ~/{{ exp_files_name }}
         dest: ~/
         remote_src: true
     - name: Create the exp results dir
       tags:
-        - dir
+        - teste
       ansible.builtin.file:
-        path: report_dir
+        path: "{{ report_dir }}"
         state: directory
         mode: '0755'
+    - name: Run test
+      tags: wapiti
+      ansible.builtin.command: wapiti --help
+      register: my_output
+      changed_when: my_output.rc != 0
     - name: Run experiments
       tags:
-        - test
-      ansible.builtin.command: python3 wapiti_exec_docker.py
-      environment: "{{ exp_env }}"
+        - un
+      ansible.builtin.shell: |
+        python3 wapiti_exec.py --exp_round {{ exp_round }} \
+        --report_dir {{ report_dir }} --max_scan_time {{ max_scan_time }} \
+        --max_attack_time {{ max_attack_time }} --urls_path cidade_{{ my_idx + 1 }} \
+        --severity_dict_path {{ severity_dict_path }} --city_dict_path {{ city_dict_path }}
       args:
         chdir: ~
       delegate_to: "{{ item }}"
@@ -75,10 +92,14 @@
       loop_control:
         index_var: my_idx
     - name: Compress results
+      tags:
+        - fausto
       ansible.builtin.command: zip -r {{ report_dir }}.zip {{ report_dir }}
       register: my_output
       changed_when: my_output.rc != 0
     - name: Copy results to local machine
+      tags:
+        - fausto
       ansible.builtin.fetch:
         src: "{{ report_dir }}.zip"
         dest: "{{ local_wapiti_files_path }}"
