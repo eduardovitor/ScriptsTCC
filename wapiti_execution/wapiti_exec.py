@@ -65,7 +65,7 @@ def wapiti(urls, severity_dict, report_dir, exp_round, city_dict, max_scan_time,
         file_extension = '.json'
         name_to_save = define_report_name(urls[i])
         filepath = home_folder + name_to_save + '_' + exp_round + file_extension
-        final_args = '-d 4 -v 2 -f json -o '+ filepath + '--max-scan-time' + ' ' + max_scan_time + ' ' + '--max-attack-time' + ' ' + max_attack_time
+        final_args = '-d 4 -v 2 -f json -o '+ filepath + ' ' + '--max-scan-time' + ' ' + max_scan_time + ' ' + '--max-attack-time' + ' ' + max_attack_time
         timestampInicio = datetime.now()
         final_command = cmd + ' ' + '-u' + ' ' + urls[i] + ' ' + final_args
         subprocess.run(final_command, shell=True)
@@ -76,13 +76,13 @@ def wapiti(urls, severity_dict, report_dir, exp_round, city_dict, max_scan_time,
         i+=1
 
 parser = argparse.ArgumentParser(description='A script to automate Wapiti execution to attack many urls sequentially')
-parser.add_argument("--exp_round", help="Adds the round information to the experiment (1,2,..)",required=True)
-parser.add_argument("--report_dir", help="Adds the dir where wapiti reports will be stored",required=True)
-parser.add_argument("--urls_path", help="Path to URLs file",default='lista_urls.txt')
-parser.add_argument("--severity_dict_path", help="Path to severity dict file",default='owasp_severity_dict_pyformat.txt')
-parser.add_argument("--city_dict_path", help="Adds the severity dict information to the experiment",default='url_cidade_dict.csv')
-parser.add_argument("--max_scan_time", help="Defines the limit time for the scan", required=True)
-parser.add_argument("--max_attack_time", help="Defines the limit time for each module attack phase", required=True)
+parser.add_argument("--exp-round", help="Adds the round information to the experiment (1,2,..)",required=True)
+parser.add_argument("--report-dir", help="Adds the dir where wapiti reports will be stored",required=True)
+parser.add_argument("--urls-path", help="Path to URLs file",default='lista_urls.txt')
+parser.add_argument("--severity-dict-path", help="Path to severity dict file",default='owasp_severity_dict_pyformat.txt')
+parser.add_argument("--city-dict-path", help="Adds the severity dict information to the experiment",default='url_cidade_dict.csv')
+parser.add_argument("--max-scan-time", help="Defines the limit time for the scan", required=True)
+parser.add_argument("--max-attack-time", help="Defines the limit time for each module attack phase", required=True)
 args = parser.parse_args()
 urls = get_urls_from_file(args.urls_path)
 owasp_dict = get_severity_dict_from_file(args.severity_dict_path)

@@ -65,7 +65,7 @@ def wapiti(urls, severity_dict, report_dir, exp_round, city_dict, max_scan_time,
         file_extension = '.json'
         name_to_save = define_report_name(urls[i])
         filepath = home_folder + name_to_save + '_' + exp_round + file_extension
-        final_args = '-d 4 -v 2 -f json -o '+ filepath + '--max-scan-time' + ' ' + max_scan_time + ' ' + '--max-attack-time' + ' ' + max_attack_time
+        final_args = '-d 4 -v 2 -f json -o '+ filepath + ' ' + '--max-scan-time' + ' ' + max_scan_time + ' ' + '--max-attack-time' + ' ' + max_attack_time
         timestampInicio = datetime.now()
         final_command = cmd + ' ' + '-u' + ' ' + urls[i] + ' ' + final_args
         subprocess.run(final_command, shell=True)
