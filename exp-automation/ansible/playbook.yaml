@@ -77,7 +77,7 @@
       ansible.builtin.shell: |
         python3 wapiti_exec.py --exp-round {{ exp_round }} \
         --report-dir {{ report_dir }} --max-scan-time {{ max_scan_time }} \
-        --max-attack-time {{ max_attack_time }} --urls-path cidade_{{ my_idx + 3 }} \
+        --max-attack-time {{ max_attack_time }} --urls-path cidade_{{ my_idx + 1 }} \
         --severity-dict-path {{ severity_dict_path }} --city-dict-path {{ city_dict_path }} > stdout.txt 2>stderr.txt
       args:
         chdir: ~
