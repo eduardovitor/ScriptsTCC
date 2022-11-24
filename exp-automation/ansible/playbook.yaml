@@ -5,14 +5,14 @@
   vars:
     report_dir: "~/report_results/"
     wapiti_file_name: "wapiti-3.1.4-bugfix.tar.gz"
-    local_wapiti_files_path: "/home/tcc/Downloads"
+    local_wapiti_files_path: "/home/eduardovitor/Downloads"
     wapiti_remote_dir: "wapiti-3.1.4/"
-    exp_files_name: "experiment_setup.tar.xz"
+    exp_files_name: "experiment_setup.tar.gz"
     exp_round: 1
     severity_dict_path: owasp_severity_dict_pyformat.txt
     city_dict_path: url_cidade_dict.txt
-    max_scan_time: 300
-    max_attack_time: 30
+    max_scan_time: 200
+    max_attack_time: 10
   tasks:
     - name: Install Pip
       tags:
@@ -71,19 +71,14 @@
         path: "{{ report_dir }}"
         state: directory
         mode: '0755'
-    - name: Run test
-      tags: wapiti
-      ansible.builtin.command: wapiti --help
-      register: my_output
-      changed_when: my_output.rc != 0
     - name: Run experiments
       tags:
-        - un
+        - run_exp
       ansible.builtin.shell: |
-        python3 wapiti_exec.py --exp_round {{ exp_round }} \
-        --report_dir {{ report_dir }} --max_scan_time {{ max_scan_time }} \
-        --max_attack_time {{ max_attack_time }} --urls_path cidade_{{ my_idx + 1 }} \
-        --severity_dict_path {{ severity_dict_path }} --city_dict_path {{ city_dict_path }}
+        python3 wapiti_exec.py --exp-round {{ exp_round }} \
+        --report-dir {{ report_dir }} --max-scan-time {{ max_scan_time }} \
+        --max-attack-time {{ max_attack_time }} --urls-path cidade_{{ my_idx + 3 }} \
+        --severity-dict-path {{ severity_dict_path }} --city-dict-path {{ city_dict_path }} > stdout.txt 2>stderr.txt
       args:
         chdir: ~
       delegate_to: "{{ item }}"
@@ -93,13 +88,13 @@
         index_var: my_idx
     - name: Compress results
       tags:
-        - fausto
-      ansible.builtin.command: zip -r {{ report_dir }}.zip {{ report_dir }}
-      register: my_output
-      changed_when: my_output.rc != 0
+        - zip
+      community.general.files.archive:
+        path: "{{ report_dir }}"
+        dest: "{{ inventory_hostname }}.zip"
     - name: Copy results to local machine
       tags:
-        - fausto
+        - copy_res
       ansible.builtin.fetch:
-        src: "{{ report_dir }}.zip"
+        src: "~/{{ inventory_hostname }}.zip"
         dest: "{{ local_wapiti_files_path }}"

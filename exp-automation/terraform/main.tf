@@ -32,7 +32,7 @@ resource "aws_instance" "wapiti" {
   vpc_security_group_ids = ["sg-01e4a2e2d9dd844da"]
 
   tags = {
-    Name  = "wapiti_${count.index}"
+    Name  = "wapiti_${count.index+1}"
     Owner = "eduvitor"
   }
 }
