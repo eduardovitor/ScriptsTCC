@@ -8,10 +8,12 @@ output: html_document
 ```{r}
  library(tidyverse)
  library(dplyr)
+ library(RColorBrewer)
 ```
 
+
 ```{r Leitura dos arquivos}
-  workdir ="/home/eduardovitor/Downloads/Share_R_Analysis-20221025T173621Z-001/Share_R_Analysis/"
+  workdir ="/home/eduardovitor/Downloads/Wapiti_Result_Files/"
   vul_arquivo = paste(workdir,"vul_data.csv",sep="")
   info_adicional_arquivo = paste(workdir, "additional_info.csv",sep="")
   df_vulnerabilidades = read_csv(vul_arquivo)
@@ -21,6 +23,7 @@ output: html_document
 ```{r}
   str(df_vulnerabilidades)
 ```
+
 ```{r}
   str(df_info_adicional)
 ```
@@ -35,33 +38,235 @@ output: html_document
 ```{r Qual foi o tempo médio de testes entre as cidades analisadas?}
    df_info_adicional  %>% 
    filter(duration_min>0) %>% 
-   summarise(media_duracao_testes=mean(duration_min), desvio_padrao=sd(duration_min))
+   summarise(media_duracao_testes=mean(duration_min), desvio_padrao=sd(duration_min), total_tempo=sum(duration_min))
 ```
+```{r}
+
+```
+
 
 
 
 ```{r Qual foi a média de páginas escaneadas pela ferramenta entre as cidades analisadas?}
-  print("Resumo das páginas escaneadas")
-  summary(df_info_adicional$crawled_pages)
-  
+ print("Resumo das páginas escaneadas")
+ summary(df_info_adicional$crawled_pages)
+ 
 ```
+```{r}
+  sum(df_info_adicional$crawled_pages)
+```
+
 
 ```{r Qual é a categoria de vulnerabilidade mais comum entre as cidades analisadas?}
  # df_vulnerabilidades %>% count(df_vulnerabilidades$vul_category)
   df_vulnerabilidades %>% 
-  ggplot(aes(x = vul_category, fill=vul_category)) +
+  ggplot(aes(x = vul_classification_owasp, fill=vul_classification_owasp)) +
   geom_bar()+
   theme_minimal()+
-  labs(x='Categoria de vulnerabilidade')
+  labs(x='Vulnerabilidades')+
+  scale_fill_brewer(palette="Set1")
+  
 ```
 
-```{r Qual é a quantidade de vulnerabilidades entre as cidades analisadas?}
-  df_vulnerabilidades %>% 
-  ggplot(aes(x = city, fill=vul_category)) +
-  geom_bar(position = "fill")+
+```{r}
+  df_teste_2 <- df_vulnerabilidades %>% 
+  group_by(vul_classification_owasp) %>% 
+  arrange(desc(vul_classification_owasp)) %>% 
+  summarise(
+    count=n()
+  )
+```
+
+```{r}
+write.csv(df_teste_2, "/home/eduardovitor/Desktop/df_vul_dist.csv", row.names=FALSE)
+```
+
+
+```{r}
+df_teste_2 %>% 
+  ggplot(aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=vul_classification_owasp)) +
+     geom_rect() +
+     coord_polar(theta="y",direction=-1) + # Try to remove that to understand how the chart is built initially
+     xlim(c(2, 4))+ # Try to remove that to see how to make a pie chart
+     theme_void()
+```
+
+
+```{r}
+df_teste_2 %>% 
+  ggplot(aes(x="", y=percentual, fill=vul_classification_owasp)) +
+  geom_bar(stat="identity", width=1, color="white") +
+  coord_polar("y", start=0) +
+  theme_void() + 
+  geom_text(aes(label = paste0(round(percentual), "%")), position = position_stack(vjust = 0.5, reverse = FALSE), size=3)+
+  scale_fill_brewer(palette="Set1")
+```
+
+```{r}
+ df_test <- df_vulnerabilidades %>% 
+  group_by(city) %>% 
+  summarise(
+     count=n(), percentual=(count/667)*100, count_lower_5=count<=5
+)
+```
+
+```{r}
+  mean(df_test$count)
+  median(df_test$count)
+  sd(df_test$count)
+  max(df_test$count)
+  min(df_test$count)
+```
+```{r}
+#pdf(file = "/home/eduardovitor/Desktop/histograma_cidades_vul.pdf",width = 6, height = 4)
+df_test %>% 
+  ggplot(aes(x=count)) + 
   theme_minimal()+
+  geom_histogram(color="black", fill="white", bins=30)+
+  labs(x='Número de vulnerabilidades', y='Quantidade de cidades')
+#dev.off()
+```
+```{r}
+  
+  dev.off()
+```
+
+
+
+
+
+
+
+
+```{r Qual é a quantidade de vulnerabilidades entre as cidades analisadas?}
+df_vulnerabilidades %>% 
+  ggplot(aes(x = city, fill=vul_classification_owasp)) +
+  geom_bar(position = "fill")+
   labs(x='Cidade', y='Vulnerabilidades')
 ```
+```{r}
+ df_a5 <- df_vulnerabilidades %>% 
+  filter(vul_classification_owasp=="A05:2021-SecurityMisconfiguration")
+```
+
+```{r}
+df_a5 %>% 
+  group_by(city) %>% 
+  summarise(
+     n()==1
+  )
+```
+```{r}
+  df_a4 <- df_vulnerabilidades %>% 
+  filter(vul_classification_owasp=="A04:2021-InsecureDesign")
+```
+
+```{r}
+df_a4 %>% 
+  group_by(city) %>% 
+  summarise(
+     n()==1
+  )
+```
+```{r}
+  df_a3 <- df_vulnerabilidades %>% 
+  filter(vul_classification_owasp=="A03:2021-Injection")
+```
+
+```{r}
+  df_a3 %>% 
+  group_by(city) %>% 
+  summarise(
+     count=n()
+  )
+```
+
+
+```{r}
+  df_interlegis <- df_vulnerabilidades %>% 
+  filter(city=="Flexeiras" | city=="Japaratinga" | city=="Jaramataia" | city=="Junqueiro" | city=="Marechal Deodoro" | city=="Murici" | city=="Olho D´água Das Flores" | city=="Paripueira" | city=="Pilar" | city=="Santa Luzia do Norte")
+```
+
+```{r}
+  df_no_interlegis <- df_vulnerabilidades %>% 
+  filter(city !="Flexeiras" & city!="Japaratinga" & city!="Jaramataia" & city!="Junqueiro" & city!="Marechal Deodoro" & city!="Murici" & city!="Olho D´água Das Flores" & city!="Paripueira" & city!="Pilar" & city!="Santa Luzia do Norte")
+```
+
+
+```{r}
+ df_teste3 <- df_interlegis %>% 
+  group_by(city) %>% 
+  summarise(
+     count=n()
+  )
+```
+
+```{r}
+  sum(df_teste3$count)
+  mean(df_teste3$count)
+  median(df_teste3$count)
+  sd(df_teste3$count)
+  max(df_teste3$count)
+```
+
+```{r}
+  df_teste4 <- df_no_interlegis %>% 
+  group_by(city) %>% 
+  summarise(
+     count=n()
+  )
+```
+
+
+```{r}
+  sum(df_teste4$count)
+  mean(df_teste4$count)
+  median(df_teste4$count)
+  sd(df_teste4$count)
+  max(df_teste4$count)
+```
+
+```{r}
+  df_top10 <- df_vulnerabilidades %>% 
+  filter(city =="Maceió" | city=="Arapiraca" | city=="Marechal Deodoro" | city=="São Miguel Dos Campos" | city=="Coruripe" | city =="Rio Largo" | city == "União Dos Palmares" | city =="Palmeira Dos Índios" | city == "Penedo" | city=="Delmiro Gouveia")
+```
+  
+```{r}
+df_teste5 <- df_top10 %>% 
+  group_by(city) %>% 
+  summarise(
+     count=n()
+  )
+```
+
+```{r}
+  df_no_top10 <- df_vulnerabilidades %>% 
+  filter(city !="Maceió" & city!="Marechal Deodoro" & city!="São Miguel Dos Campos" & city!="Coruripe" & city !="Rio Largo" & city != "União Dos Palmares" & city !="Palmeira Dos Índios" & city != "Penedo" & city!="Delmiro Gouveia")
+```
+
+```{r}
+  df_teste6 <- df_no_top10 %>% 
+  group_by(city) %>% 
+  summarise(
+     count=n()
+  )
+```
+
+```{r}
+  median(df_teste6$count)
+  mean(df_teste6$count)
+  max(df_teste6$count)
+  median(df_teste5$count)
+  mean(df_teste5$count)
+  max(df_teste5$count)
+  sum(df_teste5$count)
+  sd(df_teste5$count)
+```
+
+
+
+
+
 
 
 
