@@ -1,9 +1,0 @@
-[wapiti]
-wapiti_0 ansible_host=ec2-44-204-169-204.compute-1.amazonaws.com # i-0bc994d6a2b03a0a4
-wapiti_1 ansible_host=ec2-3-95-224-151.compute-1.amazonaws.com # i-014dd0ccefef814e4
-
-[all:vars]
-ansible_ssh_user=ubuntu
-ansible_ssh_private_key_file=/home/eduardovitor/Downloads/exp-wapiti.pem
-ansible_python_interpreter=/usr/bin/python3
-ansible_ssh_common_args='-o StrictHostKeyChecking=no'
