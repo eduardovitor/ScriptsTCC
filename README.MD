@@ -38,6 +38,8 @@ Esse projeto foi o meu trabalho de conclusão de curso da graduação de Sistema
 
 ## ⏳ Detalhes de projeto
 
+![image](https://github.com/eduardovitor/ScriptsTCC/assets/64266915/f5688ade-2c1a-48e8-8b0c-ba17b21eace2)
+
 Esse projeto foi desenvolvido usando a ferramenta de detecção de vulnerabilidades [Wapiti](https://wapiti-scanner.github.io/) e uma infraestrutura de máquinas na nuvem, além de um conjunto de tecnologias de suporte: [Python](https://www.python.org/), [Bash](https://www.gnu.org/software/bash/), [Terraform](https://www.terraform.io/), [Ansible](https://www.ansible.com/), [R](https://www.r-project.org/) e [Go](https://go.dev/). 
 
 <br>
